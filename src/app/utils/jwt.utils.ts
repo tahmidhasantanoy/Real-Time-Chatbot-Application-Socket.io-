@@ -6,7 +6,7 @@ import config from "../config/config";
 
 type createUserType = {
   userId: any;
-  email: String;
+  email: string;
 };
 // export const generateToken = (id: string, access_token, expires_in) => {
 const generateToken = (
@@ -24,9 +24,11 @@ const generateToken = (
 const verifyToken = (token: string) => {
   try {
     const decoded = jwt.verify(token, config.access_token_secret_key as Secret);
+
+    console.log(decoded, "decode from verify");
     return decoded as JwtPayload;
-  } catch (err) {
-    return null;
+  } catch (err: any) {
+    console.log(err.message, "verify message");
   }
 };
 

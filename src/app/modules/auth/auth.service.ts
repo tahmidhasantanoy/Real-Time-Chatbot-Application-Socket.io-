@@ -3,13 +3,13 @@ import { IUserInfo } from "./auth.interface";
 import { userModel } from "./auth.model";
 import config from "../../config/config";
 import { jwthelper } from "../../utils/jwt.utils";
+import jwt, { Secret } from "jsonwebtoken";
 
 const authService = () => {};
 
 const register = async (userInfo: IUserInfo) => {
   const { name, email, password } = userInfo;
 
-  // Check: Is this email already exist!
   try {
     const isExist = await userModel.findOne({ email });
     if (isExist) return "Email already exist";
@@ -26,11 +26,15 @@ const register = async (userInfo: IUserInfo) => {
       return "No user created";
     }
 
-    const token = jwthelper.generateToken(
-      { userId: createUser._id, email: createUser.email }, //payload
-      // jwtConfig.secret,
-      // jwtConfig.expiresIn
+    const access_token = jwthelper.generateToken(
+      { userId: createUser._id, email: createUser.email },
       config.access_token_secret_key,
+      config.expires_in
+    );
+
+    const refresh_token = jwthelper.generateToken(
+      { userId: createUser._id, email: createUser.email },
+      config.refresh_token_secret_key,
       config.expires_in
     );
 
@@ -40,7 +44,8 @@ const register = async (userInfo: IUserInfo) => {
         name: createUser.name,
         email: createUser.email,
       },
-      token,
+      accessToken: access_token,
+      refreshToken: refresh_token,
     };
   } catch (error) {
     console.log(error);
@@ -55,15 +60,59 @@ const login = async (userInfo: IUserInfo) => {
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw new Error("Invalid credentials");
 
-  const token = jwthelper.generateToken(
+  const access_token = jwthelper.generateToken(
     { userId: user._id, email: user.email },
     config.access_token_secret_key,
     config.expires_in
   );
+
+  const refresh_token = jwthelper.generateToken(
+    { userId: user._id, email: user.email },
+    config.refresh_token_secret_key,
+    config.expires_in
+  );
+
   return {
-    user: { id: user._id, email: user.email },
-    token,
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+    },
+    accessToken: access_token,
+    refreshToken: refresh_token,
   };
+};
+
+const refreshToken = (refreshToken: string) => {
+  const decoded = jwt.verify(
+    refreshToken,
+    config.refresh_token_secret_key as Secret
+  );
+
+  if (typeof decoded === "string") {
+    console.log("Token payload is string:", decoded);
+  } else {
+    console.log(decoded.userId, "decode from service");
+    if (decoded) {
+      const payload = {
+        userId: decoded.userId,
+        email: decoded.email,
+      };
+      const access_token = jwthelper.generateToken(
+        payload,
+        config.access_token_secret_key,
+        config.expires_in
+      );
+
+      const refresh_token = jwthelper.generateToken(
+        payload,
+        config.refresh_token_secret_key,
+        config.expires_in
+      );
+
+      return { refresh_token, access_token };
+    }
+  }
 };
 
 const test = async () => {
@@ -74,4 +123,5 @@ export default {
   register,
   login,
   test,
+  refreshToken,
 };
