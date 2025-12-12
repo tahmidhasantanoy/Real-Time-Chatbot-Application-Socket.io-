@@ -6,7 +6,14 @@ import mongoose from "mongoose";
 let server: Server;
 const bootstrap = async () => {
   try {
-    await mongoose.connect(config.db_url as string);
+    await mongoose
+      .connect(config.db_url as string)
+      .then(() => {
+        console.log("DB coonceted");
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
 
     server = app.listen(config.port, () => {
       console.log(`Example app listening on port ${config.port}`);
