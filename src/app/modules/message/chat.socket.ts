@@ -29,6 +29,10 @@ export const chatSocket = (io: Server) => {
   io.on("connection", (socket: ExtendedSocket) => {
     // const userId = socket.user!.id;
     const userId = socket.user!.userId;
+    // PC
+    // if (userId) {
+    //   socket.join(userId);
+    // }
     onlineUsers.set(userId, socket.id);
 
     // join default room
@@ -64,13 +68,20 @@ export const chatSocket = (io: Server) => {
           };
 
           if (receiverId) {
-            // private
+            //for private
+            // PC
+            // io.to(receiverId).emit("message_received", msg);
+            // socket.emit("message_received", msg);
+
             const recvSocket = onlineUsers.get(receiverId);
             if (recvSocket) io.to(recvSocket).emit("message_received", out);
             socket.emit("message_sent", out);
           } else {
             // global
             io.to("global").emit("message_received", out);
+
+            // PC
+            // io.emit("message_received", msg);
           }
         } catch (err) {
           socket.emit("error", { message: "Message failed" });

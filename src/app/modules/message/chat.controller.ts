@@ -26,8 +26,15 @@ const fetchGlobal = async (_req: Request, res: Response) => {
 };
 
 const fetchPrivate = async (req: Request, res: Response) => {
-  const userId = (req as any).user.id;
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+  const userId = jwthelper.verifyToken(token)?.userId;
+  // const userId = (req as any).user.id;
   const otherId = req.params.otherId;
+
+  console.log(userId, otherId, "From chat controller");
+
   const msgs = await chatService.getPrivateMessages(userId, otherId);
   res.json({ success: true, data: msgs });
 };
