@@ -11,7 +11,7 @@ export const authMiddleware = (
 
   try {
     const verified = jwthelper.verifyToken(token);
-    console.log(verified, "verified in middleware"); //null
+    console.log(verified, "verified in middleware");
     next();
   } catch (err) {
     res.status(403).json({ message: "Invalid Token" });

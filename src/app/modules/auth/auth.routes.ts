@@ -8,7 +8,10 @@ const authRouter = express.Router();
 authRouter.post("/register", authController.register);
 authRouter.post("/login", authController.login);
 authRouter.post("/test", authMiddleware, authController.test);
-authRouter.post("/refresh-token", /* authMiddleware, */ authController.refreshToken);
+authRouter.post(
+  "/refresh-token",
+  /* authMiddleware, */ authController.refreshToken
+);
 authRouter.get("/", authController.authController); // Just for check
 
 export default authRouter;

@@ -8,16 +8,16 @@ import jwt, { Secret } from "jsonwebtoken";
 const authService = () => {};
 
 const register = async (userInfo: IUserInfo) => {
-  const { name, email, password } = userInfo;
-
   try {
+    const { username, email, password } = userInfo;
+
     const isExist = await userModel.findOne({ email });
     if (isExist) return "Email already exist";
 
     const hashPassword = await bcrypt.hash(password as string, 10);
 
     const createUser = await userModel.create({
-      name,
+      username,
       email,
       password: hashPassword,
     });
@@ -41,14 +41,14 @@ const register = async (userInfo: IUserInfo) => {
     return {
       user: {
         id: createUser._id,
-        name: createUser.name,
+        name: createUser.username,
         email: createUser.email,
       },
       accessToken: access_token,
       refreshToken: refresh_token,
     };
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    console.log(error.message);
   }
 };
 const login = async (userInfo: IUserInfo) => {
@@ -75,7 +75,7 @@ const login = async (userInfo: IUserInfo) => {
   return {
     user: {
       id: user._id,
-      name: user.name,
+      name: user.username,
       email: user.email,
     },
     accessToken: access_token,
@@ -107,7 +107,7 @@ const refreshToken = (refreshToken: string) => {
       const refresh_token = jwthelper.generateToken(
         payload,
         config.refresh_token_secret_key,
-        config.expires_in
+        config.refresh_expires_in
       );
 
       return { refresh_token, access_token };

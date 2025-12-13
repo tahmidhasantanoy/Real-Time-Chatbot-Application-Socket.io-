@@ -1,6 +1,11 @@
-// small shared types
+// export interface JwtPayload {
+//   id: string;
+//   iat?: number;
+//   exp?: number;
+// }
+
 export interface JwtPayload {
-  id: string;
+  userId: any;
   iat?: number;
   exp?: number;
 }
