@@ -17,10 +17,8 @@ const bootstrap = async () => {
         const httpServer = http.createServer(app);
         const io = new IOServer(httpServer, { cors: { origin: "*" } });
 
-        // attach socket logic
         chatSocket(io);
 
-        // START the httpServer (not app.listen)
         server = httpServer.listen(config.port, () => {
           console.log(`Server listening on port ${config.port}`);
         });

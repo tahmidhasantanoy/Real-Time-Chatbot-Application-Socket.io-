@@ -10,7 +10,7 @@ app.use(cors());
 
 // APIs
 app.use("/api/auth", authRouter);
-app.use("/api/chat", chatRoutes); // working
+app.use("/api/chat", chatRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello quick World!");

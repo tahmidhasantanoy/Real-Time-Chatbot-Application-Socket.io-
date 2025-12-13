@@ -30,7 +30,6 @@ const fetchPrivate = async (req: Request, res: Response) => {
   if (!token) return res.status(401).json({ message: "Unauthorized" });
 
   const userId = jwthelper.verifyToken(token)?.userId;
-  // const userId = (req as any).user.id;
   const otherId = req.params.otherId;
 
   console.log(userId, otherId, "From chat controller");

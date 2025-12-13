@@ -1,10 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import authService from "./auth.service";
 
-const authController = (req: Request, res: Response) => {
-  res.send("It's fine"); // Just for check
-};
-
 const register = async (req: Request, res: Response, next: NextFunction) => {
   const userInfo = req.body;
 
@@ -18,22 +14,11 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     });
   }
 };
+
 const login = async (req: Request, res: Response) => {
   const userInfo = req.body;
 
   const responseFromService = await authService.login(userInfo);
-
-  if (responseFromService) {
-    res.json({
-      success: true,
-      message: "ok",
-      data: responseFromService,
-    });
-  }
-};
-
-const test = async (req: Request, res: Response) => {
-  const responseFromService = await authService.test();
 
   if (responseFromService) {
     res.json({
@@ -60,9 +45,7 @@ const refreshToken = async (req: Request, res: Response) => {
 };
 
 export default {
-  authController,
   login,
   register,
-  test,
   refreshToken,
 };

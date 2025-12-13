@@ -11,7 +11,6 @@ const saveMessage = async (
       receiver: receiverId || null,
       content,
     });
-    console.log(msg, "msg in service"); // ok
     return msg;
   } catch (error: any) {
     console.log(error.message, "Error in service");
@@ -23,8 +22,6 @@ const getGlobalMessages = async (limit = 50) => {
     .sort({ createdAt: -1 })
     .limit(limit)
     .lean();
-
-    // console.log(queryMsg);
 
     return queryMsg
 };

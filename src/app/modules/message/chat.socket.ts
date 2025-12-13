@@ -3,15 +3,12 @@ import { jwthelper } from "../../utils/jwt.utils";
 import { Socket, Server } from "socket.io";
 
 interface ExtendedSocket extends Socket {
-  // user?: { id: string };
   user?: { userId: string };
 }
 
-// simple map userId -> socketId (single-node demo)
 const onlineUsers = new Map<string, string>();
 
 export const chatSocket = (io: Server) => {
-  // handshake auth verification
   io.use((socket: Socket, next) => {
     const token = socket.handshake.auth?.token;
     if (!token) return next(new Error("Authentication error: token missing"));
@@ -19,23 +16,15 @@ export const chatSocket = (io: Server) => {
     const decoded = jwthelper.verifyToken(token);
     if (!decoded) return next(new Error("Authentication error: invalid token"));
 
-    // (socket as ExtendedSocket).user = { id: decoded.id };
-    // (socket as ExtendedSocket).user = { id: decoded.id };
     (socket as ExtendedSocket).user = { userId: decoded.userId };
     (socket as ExtendedSocket).user = { userId: decoded.userId };
     return next();
   });
 
   io.on("connection", (socket: ExtendedSocket) => {
-    // const userId = socket.user!.id;
     const userId = socket.user!.userId;
-    // PC
-    // if (userId) {
-    //   socket.join(userId);
-    // }
     onlineUsers.set(userId, socket.id);
 
-    // join default room
     socket.join("global");
 
     // inform others
@@ -68,20 +57,12 @@ export const chatSocket = (io: Server) => {
           };
 
           if (receiverId) {
-            //for private
-            // PC
-            // io.to(receiverId).emit("message_received", msg);
-            // socket.emit("message_received", msg);
-
             const recvSocket = onlineUsers.get(receiverId);
             if (recvSocket) io.to(recvSocket).emit("message_received", out);
             socket.emit("message_sent", out);
           } else {
             // global
             io.to("global").emit("message_received", out);
-
-            // PC
-            // io.emit("message_received", msg);
           }
         } catch (err) {
           socket.emit("error", { message: "Message failed" });

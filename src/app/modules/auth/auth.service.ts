@@ -5,8 +5,6 @@ import config from "../../config/config";
 import { jwthelper } from "../../utils/jwt.utils";
 import jwt, { Secret } from "jsonwebtoken";
 
-const authService = () => {};
-
 const register = async (userInfo: IUserInfo) => {
   try {
     const { username, email, password } = userInfo;
@@ -115,13 +113,8 @@ const refreshToken = (refreshToken: string) => {
   }
 };
 
-const test = async () => {
-  return "Okay now";
-};
 export default {
-  authService,
   register,
   login,
-  test,
   refreshToken,
 };
